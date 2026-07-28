@@ -64,6 +64,7 @@
 
     <main class="max-w-4xl mx-auto px-4 -mt-10 relative z-20 space-y-6">
 
+        <!-- 最新公告與即時進度 (推播置頂) -->
         <section class="glass-panel rounded-3xl p-6 relative overflow-hidden">
             <div class="absolute -right-10 -top-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
             
@@ -84,7 +85,7 @@
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
                     <h4 class="text-sm font-semibold text-gray-200 flex items-center gap-1.5">
-                        <span>📢</span> 最新重要公告
+                        <span>📢</span> 最新重要公告 (推播)
                     </h4>
                 </div>
                 <div class="text-sm text-gray-200 bg-white/5 p-4 rounded-xl border border-white/5 space-y-3">
@@ -99,6 +100,7 @@
             </div>
         </section>
 
+        <!-- 即時氣象與觀星指數 -->
         <section class="glass-panel rounded-3xl p-6">
             <h2 class="text-base font-bold text-white flex items-center gap-2 mb-4">
                 <span>⛅</span> 合歡山即時氣象與觀星指數
@@ -127,6 +129,7 @@
             </div>
         </section>
 
+        <!-- 行程與景點導覽 -->
         <section class="glass-panel rounded-3xl p-6 space-y-6">
             <h2 class="text-base font-bold text-white flex items-center gap-2">
                 <span>🏔️</span> 合歡山深度導覽與兩日行程
@@ -186,6 +189,7 @@
             </div>
         </section>
 
+        <!-- 交通與地圖導航 -->
         <section class="glass-panel rounded-3xl p-6 space-y-3">
             <h2 class="text-base font-bold text-white flex items-center gap-2">
                 <span>🗺️</span> 交通路線與地圖導航
@@ -201,17 +205,19 @@
             </div>
         </section>
 
+        <!-- 精選活動相簿牆 -->
         <section class="glass-panel rounded-3xl p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-base font-bold text-white flex items-center gap-2">
-                    <span>✨</span> 活動精選推播
+                    <span>✨</span> 活動精選相簿牆
                 </h2>
             </div>
             <div id="ui-gallery" class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <p class="text-xs text-gray-400 col-span-full text-center py-4">尚無精選照片，等待管理員推播...</p>
+                <p class="text-xs text-gray-400 col-span-full text-center py-4">尚無精選照片，等待管理員發布...</p>
             </div>
         </section>
 
+        <!-- 夥伴即時聊天室 -->
         <section class="glass-panel rounded-3xl p-6 flex flex-col h-[500px]">
             <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
                 <div class="flex items-center space-x-2">
@@ -244,10 +250,10 @@
 
     </main>
 
+    <!-- 前端 Firebase 邏輯 (純 Firestore / Base64 模式) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, onSnapshot, collection, addDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBk59eK_XmQIuDjhxjH6o_VWNaIu28M_Rg",
@@ -261,7 +267,16 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app);
+
+        // 輔助函式：將檔案轉成 Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
 
         // 1. 即時監聽後台設定 (行程、公告與氣象)
         onSnapshot(doc(db, "config", "main"), (docSnap) => {
@@ -293,16 +308,16 @@
             }
         });
 
-        // 2. 即時監聽精選照片牆 (附下載按鈕)
+        // 2. 即時監聽精選照片牆 (Base64 解碼顯示)
         onSnapshot(collection(db, "gallery"), (snapshot) => {
             const galleryDiv = document.getElementById('ui-gallery');
             galleryDiv.innerHTML = "";
             if (snapshot.empty) {
-                galleryDiv.innerHTML = `<p class="text-xs text-gray-400 col-span-full text-center py-4">尚無精選照片，等待管理員推播...</p>`;
+                galleryDiv.innerHTML = `<p class="text-xs text-gray-400 col-span-full text-center py-4">尚無精選照片，等待管理員發布...</p>`;
                 return;
             }
-            snapshot.forEach((doc) => {
-                const item = doc.data();
+            snapshot.forEach((docSnap) => {
+                const item = docSnap.data();
                 galleryDiv.innerHTML += `
                     <div class="group relative rounded-2xl overflow-hidden aspect-square border border-white/10">
                         <img src="${item.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
@@ -319,7 +334,7 @@
             });
         });
 
-        // 3. 聊天室名字記憶與即時訊息 (聊天室圖片加下載按鈕)
+        // 3. 聊天室名字記憶與即時訊息 (支援圖片 Base64 傳送)
         let username = localStorage.getItem('hehuanshan_username');
         if (!username) {
             username = prompt("請輸入你的稱呼：") || ("名稱" + Math.floor(Math.random()*1000));
@@ -359,20 +374,17 @@
             const file = inputElem.files[0];
 
             try {
-                const filename = `chat/${Date.now()}_${file.name}`;
-                const storageRef = ref(storage, filename);
-                const snapshot = await uploadBytes(storageRef, file);
-                const downloadURL = await getDownloadURL(snapshot.ref);
+                const base64String = await fileToBase64(file);
 
                 await addDoc(collection(db, "messages"), {
                     name: username,
                     text: "傳送了一張照片 📷",
-                    image_url: downloadURL,
+                    image_url: base64String,
                     timestamp: serverTimestamp()
                 });
                 inputElem.value = "";
             } catch (e) {
-                alert("圖片上傳失敗：" + e.message);
+                alert("圖片過大或上傳失敗：" + e.message);
             }
         };
 
@@ -380,8 +392,8 @@
         onSnapshot(q, (snapshot) => {
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML = "";
-            snapshot.forEach((doc) => {
-                const msg = doc.data();
+            snapshot.forEach((docSnap) => {
+                const msg = docSnap.data();
                 const isMe = msg.name === username;
                 const timeStr = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '剛剛';
 
