@@ -98,14 +98,17 @@
                 </div>
                 <div class="text-sm text-gray-200 bg-white/5 p-4 rounded-xl border border-white/5 space-y-3">
                     <p id="ui-notice">載入中...</p>
-                    <div id="ui-notice-img-container" class="hidden rounded-xl overflow-hidden border border-white/10 max-h-72">
+                    <div id="ui-notice-img-container" class="hidden rounded-xl overflow-hidden border border-white/10 max-h-72 relative group">
                         <img id="ui-notice-img" src="" class="w-full object-cover">
+                        <a id="ui-notice-download" href="" target="_blank" download class="absolute bottom-3 right-3 bg-black/60 hover:bg-black/80 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-lg border border-white/20 flex items-center gap-1.5 transition">
+                            ⬇️ 下載圖片
+                        </a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 2. 即時山區氣象與觀星指數 (支援後台即時更新) -->
+        <!-- 2. 即時山區氣象與觀星指數 -->
         <section class="glass-panel rounded-3xl p-6">
             <h2 class="text-base font-bold text-white flex items-center gap-2 mb-4">
                 <span>⛅</span> 合歡山即時氣象與觀星指數
@@ -143,13 +146,13 @@
             <!-- 行程概述 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-2">
-                    <span class="text-xs font-semibold text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full">Day 1 (8/8) 啟程與銀河夜</span>
-                    <h3 class="font-bold text-white text-sm">出發 $\rightarrow$ 武嶺 $\rightarrow$ 暗空公園觀星</h3>
+                    <span class="text-xs font-semibold text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full">Day 1 (8/8) 銀河</span>
+                    <h3 class="font-bold text-white text-sm">前往武嶺、暗空公園觀星</h3>
                     <p class="text-xs text-gray-300 leading-relaxed">合歡山行程</p>
                 </div>
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-2">
                     <span class="text-xs font-semibold text-purple-300 bg-purple-500/20 px-2.5 py-1 rounded-full">Day 2 (8/9) 登峰與放鬆</span>
-                    <h3 class="font-bold text-white text-sm">合歡山主峰 $\rightarrow$ 清境農場 $\rightarrow$ 賦歸</h3>
+                    <h3 class="font-bold text-white text-sm">合歡山主峰 --->清境農場</h3>
                     <p class="text-xs text-gray-300 leading-relaxed">合歡山主峰。</p>
                 </div>
             </div>
@@ -213,7 +216,7 @@
             </div>
         </section>
 
-        <!-- 5. 精選活動相簿牆 (Firebase 即時連動) -->
+        <!-- 5. 精選活動相簿牆 (附下載按鈕) -->
         <section class="glass-panel rounded-3xl p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-base font-bold text-white flex items-center gap-2">
@@ -225,7 +228,7 @@
             </div>
         </section>
 
-        <!-- 6. 夥伴即時聊天室 (支援文字與直接上傳圖片) -->
+        <!-- 6. 夥伴即時聊天室 (附圖片下載按鈕) -->
         <section class="glass-panel rounded-3xl p-6 flex flex-col h-[500px]">
             <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
                 <div class="flex items-center space-x-2">
@@ -285,12 +288,10 @@
         onSnapshot(doc(db, "config", "main"), (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                // 行程與公告
                 document.getElementById('ui-activity').innerText = data.current_activity || "尚無行程";
                 document.getElementById('ui-desc').innerText = data.current_desc || "";
                 document.getElementById('ui-notice').innerText = data.latest_notice || "目前沒有新公告";
                 
-                // 氣象資訊
                 if (data.weather_temp) document.getElementById('ui-weather-temp').innerText = data.weather_temp;
                 if (data.weather_temp_desc) document.getElementById('ui-weather-temp-desc').innerText = data.weather_temp_desc;
                 if (data.weather_rain) document.getElementById('ui-weather-rain').innerText = data.weather_rain;
@@ -302,8 +303,10 @@
 
                 const imgContainer = document.getElementById('ui-notice-img-container');
                 const imgEl = document.getElementById('ui-notice-img');
+                const imgDownload = document.getElementById('ui-notice-download');
                 if (data.notice_image) {
                     imgEl.src = data.notice_image;
+                    imgDownload.href = data.notice_image;
                     imgContainer.classList.remove('hidden');
                 } else {
                     imgContainer.classList.add('hidden');
@@ -311,7 +314,7 @@
             }
         });
 
-        // 2. 即時監聽精選照片牆
+        // 2. 即時監聽精選照片牆 (附下載按鈕)
         onSnapshot(collection(db, "gallery"), (snapshot) => {
             const galleryDiv = document.getElementById('ui-gallery');
             galleryDiv.innerHTML = "";
@@ -324,7 +327,12 @@
                 galleryDiv.innerHTML += `
                     <div class="group relative rounded-2xl overflow-hidden aspect-square border border-white/10">
                         <img src="${item.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-3">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition flex flex-col justify-between p-3">
+                            <div class="flex justify-end">
+                                <a href="${item.image_url}" target="_blank" download class="bg-white/20 hover:bg-white/40 backdrop-blur-md text-white text-[10px] px-2.5 py-1 rounded-lg border border-white/30 flex items-center gap-1 transition">
+                                    下載檔案
+                                </a>
+                            </div>
                             <p class="text-xs text-white font-medium">${item.caption || ''}</p>
                         </div>
                     </div>
@@ -332,10 +340,10 @@
             });
         });
 
-        // 3. 聊天室名字記憶與即時訊息
+        // 3. 聊天室名字記憶與即時訊息 (聊天室圖片加下載按鈕)
         let username = localStorage.getItem('hehuanshan_username');
         if (!username) {
-            username = prompt("歡迎參加合歡山銀河行！請輸入你的大名：") || ("旅人_" + Math.floor(Math.random()*1000));
+            username = prompt("請輸你的稱呼：") || ("名稱" + Math.floor(Math.random()*1000));
             localStorage.setItem('hehuanshan_username', username);
         }
         document.getElementById('user-badge').innerText = `身分：${username}`;
@@ -349,7 +357,6 @@
             }
         }
 
-        // 發送文字訊息
         window.sendMessage = async function() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
@@ -368,7 +375,6 @@
             }
         };
 
-        // 發送圖片訊息
         window.sendImageMessage = async function(inputElem) {
             if (inputElem.files.length === 0) return;
             const file = inputElem.files[0];
@@ -395,12 +401,19 @@
         onSnapshot(q, (snapshot) => {
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML = "";
+            snapshot.empty;
             snapshot.forEach((doc) => {
                 const msg = doc.data();
                 const isMe = msg.name === username;
                 const timeStr = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '剛剛';
 
-                let imageHtml = msg.image_url ? `<img src="${msg.image_url}" class="rounded-xl max-h-48 object-cover w-full mt-2">` : '';
+                let imageHtml = msg.image_url ? `
+                    <div class="relative group mt-2">
+                        <img src="${msg.image_url}" class="rounded-xl max-h-48 object-cover w-full">
+                        <a href="${msg.image_url}" target="_blank" download class="absolute bottom-2 right-2 bg-black/60 hover:bg-black/80 backdrop-blur-md text-white text-[10px] px-2 py-1 rounded-md border border-white/20 flex items-center gap-1 opacity-90 transition">
+                            下載檔案
+                        </a>
+                    </div>` : '';
 
                 chatMessages.innerHTML += `
                     <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} w-full">
