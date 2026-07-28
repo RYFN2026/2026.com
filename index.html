@@ -46,7 +46,7 @@
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
             </span>
-            <span class="text-xs text-green-300 font-semibold tracking-wide">即時連線中 • 合歡山區</span>
+            <span class="text-xs text-green-300 font-semibold tracking-wide">即時連線中 • 合歡山區 (RTDB)</span>
         </div>
 
         <h1 class="z-10 text-4xl md:text-6xl font-extrabold tracking-wider bg-gradient-to-r from-blue-200 via-indigo-100 to-purple-200 bg-clip-text text-transparent drop-shadow-lg mb-3">
@@ -64,7 +64,6 @@
 
     <main class="max-w-4xl mx-auto px-4 -mt-10 relative z-20 space-y-6">
 
-        <!-- 最新公告與即時進度 (推播置頂) -->
         <section class="glass-panel rounded-3xl p-6 relative overflow-hidden">
             <div class="absolute -right-10 -top-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
             
@@ -100,7 +99,6 @@
             </div>
         </section>
 
-        <!-- 即時氣象與觀星指數 -->
         <section class="glass-panel rounded-3xl p-6">
             <h2 class="text-base font-bold text-white flex items-center gap-2 mb-4">
                 <span>⛅</span> 合歡山即時氣象與觀星指數
@@ -129,7 +127,6 @@
             </div>
         </section>
 
-        <!-- 行程與景點導覽 -->
         <section class="glass-panel rounded-3xl p-6 space-y-6">
             <h2 class="text-base font-bold text-white flex items-center gap-2">
                 <span>🏔️</span> 合歡山深度導覽與兩日行程
@@ -189,7 +186,6 @@
             </div>
         </section>
 
-        <!-- 交通與地圖導航 -->
         <section class="glass-panel rounded-3xl p-6 space-y-3">
             <h2 class="text-base font-bold text-white flex items-center gap-2">
                 <span>🗺️</span> 交通路線與地圖導航
@@ -205,7 +201,6 @@
             </div>
         </section>
 
-        <!-- 精選活動相簿牆 -->
         <section class="glass-panel rounded-3xl p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-base font-bold text-white flex items-center gap-2">
@@ -217,7 +212,6 @@
             </div>
         </section>
 
-        <!-- 夥伴即時聊天室 -->
         <section class="glass-panel rounded-3xl p-6 flex flex-col h-[500px]">
             <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
                 <div class="flex items-center space-x-2">
@@ -250,14 +244,14 @@
 
     </main>
 
-    <!-- 前端 Firebase 邏輯 (純 Firestore / Base64 模式) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, collection, addDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBk59eK_XmQIuDjhxjH6o_VWNaIu28M_Rg",
             authDomain: "project-3759533428143564262.firebaseapp.com",
+            databaseURL: "https://project-3759533428143564262-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "project-3759533428143564262",
             storageBucket: "project-3759533428143564262.firebasestorage.app",
             messagingSenderId: "451564658427",
@@ -266,7 +260,7 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = getDatabase(app);
 
         // 輔助函式：將檔案轉成 Base64
         function fileToBase64(file) {
@@ -278,10 +272,10 @@
             });
         }
 
-        // 1. 即時監聽後台設定 (行程、公告與氣象)
-        onSnapshot(doc(db, "config", "main"), (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
+        // 1. 即時監聽後台設定 (RTDB config)
+        onValue(ref(db, "config"), (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
                 document.getElementById('ui-activity').innerText = data.current_activity || "尚無行程";
                 document.getElementById('ui-desc').innerText = data.current_desc || "";
                 document.getElementById('ui-notice').innerText = data.latest_notice || "目前沒有新公告";
@@ -308,16 +302,16 @@
             }
         });
 
-        // 2. 即時監聽精選照片牆 (Base64 解碼顯示)
-        onSnapshot(collection(db, "gallery"), (snapshot) => {
+        // 2. 即時監聽精選照片牆 (RTDB gallery)
+        onValue(ref(db, "gallery"), (snapshot) => {
             const galleryDiv = document.getElementById('ui-gallery');
             galleryDiv.innerHTML = "";
-            if (snapshot.empty) {
+            const data = snapshot.val();
+            if (!data) {
                 galleryDiv.innerHTML = `<p class="text-xs text-gray-400 col-span-full text-center py-4">尚無精選照片，等待管理員發布...</p>`;
                 return;
             }
-            snapshot.forEach((docSnap) => {
-                const item = docSnap.data();
+            Object.values(data).forEach((item) => {
                 galleryDiv.innerHTML += `
                     <div class="group relative rounded-2xl overflow-hidden aspect-square border border-white/10">
                         <img src="${item.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
@@ -334,7 +328,7 @@
             });
         });
 
-        // 3. 聊天室名字記憶與即時訊息 (支援圖片 Base64 傳送)
+        // 3. 聊天室名字記憶與即時訊息 (RTDB messages)
         let username = localStorage.getItem('hehuanshan_username');
         if (!username) {
             username = prompt("請輸入你的稱呼：") || ("名稱" + Math.floor(Math.random()*1000));
@@ -357,11 +351,11 @@
             if (!text) return;
 
             try {
-                await addDoc(collection(db, "messages"), {
+                await push(ref(db, "messages"), {
                     name: username,
                     text: text,
                     image_url: "",
-                    timestamp: serverTimestamp()
+                    timestamp: Date.now()
                 });
                 input.value = "";
             } catch (e) {
@@ -376,11 +370,11 @@
             try {
                 const base64String = await fileToBase64(file);
 
-                await addDoc(collection(db, "messages"), {
+                await push(ref(db, "messages"), {
                     name: username,
                     text: "傳送了一張照片 📷",
                     image_url: base64String,
-                    timestamp: serverTimestamp()
+                    timestamp: Date.now()
                 });
                 inputElem.value = "";
             } catch (e) {
@@ -388,14 +382,15 @@
             }
         };
 
-        const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
-        onSnapshot(q, (snapshot) => {
+        onValue(ref(db, "messages"), (snapshot) => {
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML = "";
-            snapshot.forEach((docSnap) => {
-                const msg = docSnap.data();
+            const data = snapshot.val();
+            if (!data) return;
+
+            Object.values(data).forEach((msg) => {
                 const isMe = msg.name === username;
-                const timeStr = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '剛剛';
+                const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '剛剛';
 
                 let imageHtml = msg.image_url ? `
                     <div class="relative group mt-2">
@@ -422,7 +417,7 @@
         });
 
         function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return str.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">");
         }
     </script>
 </body>
