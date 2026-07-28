@@ -105,7 +105,7 @@
             </div>
         </section>
 
-        <!-- 2. 即時山區氣象與觀星指數 -->
+        <!-- 2. 即時山區氣象與觀星指數 (支援後台即時更新) -->
         <section class="glass-panel rounded-3xl p-6">
             <h2 class="text-base font-bold text-white flex items-center gap-2 mb-4">
                 <span>⛅</span> 合歡山即時氣象與觀星指數
@@ -113,23 +113,23 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
                     <p class="text-xs text-gray-400 mb-1">武嶺海拔氣溫</p>
-                    <p class="text-xl font-bold text-blue-200">10°C - 14°C</p>
-                    <span class="text-[10px] text-blue-300">夜間極冷，必備羽絨外套</span>
+                    <p id="ui-weather-temp" class="text-xl font-bold text-blue-200">10°C - 14°C</p>
+                    <span id="ui-weather-temp-desc" class="text-[10px] text-blue-300">夜間極冷，必備羽絨外套</span>
                 </div>
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
                     <p class="text-xs text-gray-400 mb-1">降雨機率</p>
-                    <p class="text-xl font-bold text-indigo-200">15%</p>
-                    <span class="text-[10px] text-indigo-300">晴朗穩定，午後有雲霧</span>
+                    <p id="ui-weather-rain" class="text-xl font-bold text-indigo-200">15%</p>
+                    <span id="ui-weather-rain-desc" class="text-[10px] text-indigo-300">晴朗穩定，午後有雲霧</span>
                 </div>
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
                     <p class="text-xs text-gray-400 mb-1">暗空公園觀星指數</p>
-                    <p class="text-xl font-bold text-purple-300">極佳 ⭐⭐⭐⭐⭐</p>
-                    <span class="text-[10px] text-purple-200">完美銀河拍攝條件</span>
+                    <p id="ui-weather-star" class="text-xl font-bold text-purple-300">極佳 ⭐⭐⭐⭐⭐</p>
+                    <span id="ui-weather-star-desc" class="text-[10px] text-purple-200">完美銀河拍攝條件</span>
                 </div>
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
-                    <p class="text-xs text-gray-400 mb-1">高山症預防</p>
-                    <p class="text-xl font-bold text-orange-200">注意保暖</p>
-                    <span class="text-[10px] text-orange-300">放慢腳步，多喝溫水</span>
+                    <p class="text-xs text-gray-400 mb-1">高山紫外線</p>
+                    <p id="ui-weather-uv" class="text-xl font-bold text-orange-200">過量級</p>
+                    <span id="ui-weather-uv-desc" class="text-[10px] text-orange-300">白天務必做好防曬</span>
                 </div>
             </div>
         </section>
@@ -281,14 +281,25 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        // 1. 即時監聽後台設定 (行程與公告)
+        // 1. 即時監聽後台設定 (行程、公告與氣象)
         onSnapshot(doc(db, "config", "main"), (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
+                // 行程與公告
                 document.getElementById('ui-activity').innerText = data.current_activity || "尚無行程";
                 document.getElementById('ui-desc').innerText = data.current_desc || "";
                 document.getElementById('ui-notice').innerText = data.latest_notice || "目前沒有新公告";
                 
+                // 氣象資訊
+                if (data.weather_temp) document.getElementById('ui-weather-temp').innerText = data.weather_temp;
+                if (data.weather_temp_desc) document.getElementById('ui-weather-temp-desc').innerText = data.weather_temp_desc;
+                if (data.weather_rain) document.getElementById('ui-weather-rain').innerText = data.weather_rain;
+                if (data.weather_rain_desc) document.getElementById('ui-weather-rain-desc').innerText = data.weather_rain_desc;
+                if (data.weather_star) document.getElementById('ui-weather-star').innerText = data.weather_star;
+                if (data.weather_star_desc) document.getElementById('ui-weather-star-desc').innerText = data.weather_star_desc;
+                if (data.weather_uv) document.getElementById('ui-weather-uv').innerText = data.weather_uv;
+                if (data.weather_uv_desc) document.getElementById('ui-weather-uv-desc').innerText = data.weather_uv_desc;
+
                 const imgContainer = document.getElementById('ui-notice-img-container');
                 const imgEl = document.getElementById('ui-notice-img');
                 if (data.notice_image) {
