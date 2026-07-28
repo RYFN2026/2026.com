@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 合歡山銀河之旅 - 官方資訊站</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .glass-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        body {
+            background: linear-gradient(135deg, #090d16 0%, #151b31 50%, #1a102f 100%);
+            min-height: 100vh;
+            color: #f3f4f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 3px; }
+    </style>
+</head>
+<body class="overflow-x-hidden pb-16">
+
+    <!-- 頁眉 (Header) -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-white/10 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <img src="https://i.ibb.co/C3bXVBpB/Background-Eraser.png" alt="Logo" class="h-10 w-auto object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">
+            <span class="font-bold text-lg tracking-wider bg-gradient-to-r from-blue-200 to-indigo-100 bg-clip-text text-transparent">合歡山銀河行 2026</span>
+        </div>
+        <div class="flex items-center space-x-2">
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            </span>
+            <span class="text-xs text-green-300 font-medium">即時連線中</span>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="max-w-4xl mx-auto px-4 mt-6 space-y-6">
+
+        <!-- 1. 即時進度與公告看板 (Firebase 即時連動) -->
+        <section class="glass-panel rounded-3xl p-6 relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-2">
+                    <span class="px-3 py-1 bg-indigo-500/30 border border-indigo-400/30 rounded-full text-xs text-indigo-200 font-semibold uppercase tracking-wider">即時進度</span>
+                    <h2 class="text-sm text-gray-300 font-medium">2026.8.8 - 8.9</h2>
+                </div>
+                <span class="text-xs text-purple-300 animate-pulse">● 即時同步中</span>
+            </div>
+
+            <!-- 目前正在進行項目 -->
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-5 mb-4">
+                <p class="text-xs text-indigo-300 font-semibold mb-1">🔥 目前正在進行</p>
+                <h3 id="ui-activity" class="text-xl font-bold text-white tracking-wide">載入中...</h3>
+                <p id="ui-desc" class="text-sm text-gray-300 mt-1">正在同步最新行程資訊...</p>
+            </div>
+
+            <!-- 最新公告區 -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-sm font-semibold text-gray-200 flex items-center gap-1.5">
+                        <span>📢</span> 最新重要公告
+                    </h4>
+                </div>
+                <div class="text-sm text-gray-200 bg-white/5 p-4 rounded-xl border border-white/5 space-y-3">
+                    <p id="ui-notice">載入中...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 即時山區氣象與觀星指數 -->
+        <section class="glass-panel rounded-3xl p-6">
+            <h2 class="text-base font-bold text-white flex items-center gap-2 mb-4">
+                <span>⛅</span> 合歡山即時氣象與觀星指數
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
+                    <p class="text-xs text-gray-400 mb-1">武嶺即時氣溫</p>
+                    <p class="text-xl font-bold text-blue-200">12°C - 15°C</p>
+                    <span class="text-[10px] text-blue-300">早晚偏冷注意保暖</span>
+                </div>
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
+                    <p class="text-xs text-gray-400 mb-1">降雨機率</p>
+                    <p class="text-xl font-bold text-indigo-200">20%</p>
+                    <span class="text-[10px] text-indigo-300">午後可能有短暫雲霧</span>
+                </div>
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
+                    <p class="text-xs text-gray-400 mb-1">暗空公園觀星指數</p>
+                    <p class="text-xl font-bold text-purple-300">極佳 ⭐⭐⭐⭐⭐</p>
+                    <span class="text-[10px] text-purple-200">無月光干擾，適合銀河</span>
+                </div>
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
+                    <p class="text-xs text-gray-400 mb-1">高山紫外線</p>
+                    <p class="text-xl font-bold text-orange-200">過量級</p>
+                    <span class="text-[10px] text-orange-300">白天務必做好防曬</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 合歡山景點地標介紹 -->
+        <section class="glass-panel rounded-3xl p-6 space-y-4">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+                <span>🏔️</span> 合歡山景點與地標導覽
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 景點 1 -->
+                <div class="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2">
+                    <div class="h-32 rounded-xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold text-white text-sm">武嶺 (3,275m)</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed">全台公路最高點，視野遼闊，是觀賞日出、雲海與拍照打卡的絕佳聖地。</p>
+                </div>
+                <!-- 景點 2 -->
+                <div class="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2">
+                    <div class="h-32 rounded-xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold text-white text-sm">合歡山暗空公園</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed">亞洲少數認證的國際暗空公園，低光害，肉眼即可清晰看見燦爛銀河。</p>
+                </div>
+                <!-- 景點 3 -->
+                <div class="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2">
+                    <div class="h-32 rounded-xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold text-white text-sm">合歡山主峰</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed">百岳之一，步道平緩好走（約2小時往返），山頂展望極佳，視野360度環景。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 交通地圖與路線指引 -->
+        <section class="glass-panel rounded-3xl p-6 space-y-4">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+                <span>🗺️</span> 交通地圖與路線指引
+            </h2>
+            <div class="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-3">
+                <p class="text-xs text-gray-300 leading-relaxed">
+                    AI摘要行程 <strong class="text-white">測試</strong> 從平地出發，走國道三號轉國道六號，經霧社、清境農場，沿台14甲線直上合歡山。
+                </p>
+                <!-- 內嵌 Google Maps 示意或快速導航按鈕 -->
+                <div class="flex gap-3 pt-2">
+                    <a href="https://maps.google.com/?q=武嶺" target="_blank" class="flex-1 text-center bg-indigo-600/60 hover:bg-indigo-600 text-white text-xs font-semibold py-2.5 rounded-xl border border-indigo-400/30 transition">
+                        📍開啟武嶺 Google 導航
+                    </a>
+                    <a href="https://maps.google.com/?q=合歡山暗空公園" target="_blank" class="flex-1 text-center bg-purple-600/60 hover:bg-purple-600 text-white text-xs font-semibold py-2.5 rounded-xl border border-purple-400/30 transition">
+                        ✨開啟暗空公園導航
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. 精選活動相簿牆 (Firebase 即時連動) -->
+        <section class="glass-panel rounded-3xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-base font-bold text-white flex items-center gap-2">
+                    <span>✨</span> 資料庫
+                </h2>
+            </div>
+            <div id="ui-gallery" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <p class="text-xs text-gray-400 col-span-full text-center py-4">尚無精選照片，等待管理員推播...</p>
+            </div>
+        </section>
+
+        <!-- 6. 即時對話聊天室 (Firebase 聊天) -->
+        <section class="glass-panel rounded-3xl p-6 flex flex-col h-[450px]">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
+                <div class="flex items-center space-x-2">
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <span>💬</span> 夥伴即時聊天室
+                    </h2>
+                    <span id="user-badge" class="text-xs bg-white/10 px-2.5 py-0.5 rounded-full text-indigo-200">身分載入中...</span>
+                </div>
+                <button onclick="changeName()" class="text-xs text-indigo-300 hover:text-white underline transition">修改名字</button>
+            </div>
+
+            <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pr-2 mb-4">
+                <!-- 聊天訊息動態載入 -->
+            </div>
+
+            <div class="flex items-center gap-2 pt-2 border-t border-white/10">
+                <input type="text" id="chat-input" placeholder="輸入訊息跟大家說..." class="flex-1 glass-input rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-400 transition" onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button onclick="sendMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-lg shadow-indigo-600/30">
+                    發送
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Firebase 邏輯 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, collection, addDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBk59eK_XmQIuDjhxjH6o_VWNaIu28M_Rg",
+            authDomain: "project-3759533428143564262.firebaseapp.com",
+            projectId: "project-3759533428143564262",
+            storageBucket: "project-3759533428143564262.firebasestorage.app",
+            messagingSenderId: "451564658427",
+            appId: "1:451564658427:web:44e09b508acf4caac79a5e",
+            measurementId: "G-BVVXS0ELET"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 1. 即時監聽後台設定 (行程與公告)
+        onSnapshot(doc(db, "config", "main"), (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                document.getElementById('ui-activity').innerText = data.current_activity || "尚無行程";
+                document.getElementById('ui-desc').innerText = data.current_desc || "";
+                document.getElementById('ui-notice').innerText = data.latest_notice || "目前沒有新公告";
+            }
+        });
+
+        // 2. 即時監聽精選照片牆
+        onSnapshot(collection(db, "gallery"), (snapshot) => {
+            const galleryDiv = document.getElementById('ui-gallery');
+            galleryDiv.innerHTML = "";
+            if (snapshot.empty) {
+                galleryDiv.innerHTML = `<p class="text-xs text-gray-400 col-span-full text-center py-4">尚無精選照片，等待管理員推播...</p>`;
+                return;
+            }
+            snapshot.forEach((doc) => {
+                const item = doc.data();
+                galleryDiv.innerHTML += `
+                    <div class="group relative rounded-2xl overflow-hidden aspect-square border border-white/10">
+                        <img src="${item.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-3">
+                            <p class="text-xs text-white font-medium">${item.caption || ''}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+
+        // 3. 聊天室名字記憶與即時訊息
+        let username = localStorage.getItem('hehuanshan_username');
+        if (!username) {
+            username = prompt("請輸入你的名字：") || ("名稱" + Math.floor(Math.random()*1000));
+            localStorage.setItem('hehuanshan_username', username);
+        }
+        document.getElementById('user-badge').innerText = `身分：${username}`;
+
+        window.changeName = function() {
+            let newName = prompt("請輸入新的名字：", username);
+            if (newName && newName.trim() !== "") {
+                username = newName.trim();
+                localStorage.setItem('hehuanshan_username', username);
+                document.getElementById('user-badge').innerText = `身分：${username}`;
+            }
+        }
+
+        window.sendMessage = async function() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            try {
+                await addDoc(collection(db, "messages"), {
+                    name: username,
+                    text: text,
+                    timestamp: serverTimestamp()
+                });
+                input.value = "";
+            } catch (e) {
+                alert("發送失敗，請稍後再試");
+            }
+        }
+
+        const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
+        onSnapshot(q, (snapshot) => {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const msg = doc.data();
+                const isMe = msg.name === username;
+                const timeStr = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '剛剛';
+
+                chatMessages.innerHTML += `
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} w-full">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <span class="text-[10px] text-gray-400">${timeStr}</span>
+                            <span class="text-xs font-semibold ${isMe ? 'text-purple-300' : 'text-indigo-300'}">${msg.name}</span>
+                        </div>
+                        <div class="${isMe ? 'bg-indigo-600/60 border-indigo-400/30' : 'bg-white/10 border-white/10'} border text-gray-100 rounded-2xl ${isMe ? 'rounded-tr-sm' : 'rounded-tl-sm'} px-4 py-2 text-sm max-w-[80%]">
+                            ${escapeHtml(msg.text)}
+                        </div>
+                    </div>
+                `;
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
+</body>
+</html>
