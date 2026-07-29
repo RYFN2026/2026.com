@@ -52,7 +52,7 @@
         </div>
     </header>
 
-    <!-- 主視覺區 (向下位移以避開固定導覽列) -->
+    <!-- 主視覺區 -->
     <div class="relative h-[65vh] w-full flex flex-col items-center justify-center text-center px-4 overflow-hidden pt-16">
         <div class="absolute inset-0 z-0">
             <img src="https://i.ibb.co/vxqSHbmP/galaxy-sky-glh4o41p7zagldb6.jpg" class="w-full h-full object-cover filter brightness-75 scale-105 animate-pulse duration-[10000ms]">
@@ -73,6 +73,18 @@
     </div>
 
     <main class="max-w-4xl mx-auto px-4 -mt-6 relative z-20 space-y-6">
+
+        <!-- 最新推播通知彈窗提示區 -->
+        <div id="push-toast" class="hidden glass-panel border border-indigo-400/50 bg-indigo-950/80 rounded-2xl p-4 flex items-center justify-between shadow-2xl animate-bounce">
+            <div class="flex items-center space-x-3">
+                <span class="text-xl">🚨</span>
+                <div>
+                    <h4 class="text-xs font-bold text-indigo-200">收到管理員新推播公告！</h4>
+                    <p id="push-toast-text" class="text-sm text-white font-medium">有新的即時行程與公告發布</p>
+                </div>
+            </div>
+            <button onclick="document.getElementById('push-toast').classList.add('hidden')" class="text-xs text-gray-300 hover:text-white px-2 py-1 bg-white/10 rounded-lg">關閉</button>
+        </div>
 
         <section class="glass-panel rounded-3xl p-6 relative overflow-hidden">
             <div class="absolute -right-10 -top-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -106,6 +118,7 @@
             </div>
         </section>
 
+        <!-- 氣象區 -->
         <section class="glass-panel rounded-3xl p-6">
             <h2 class="text-base font-bold text-white flex items-center gap-2 mb-4">
                 <span>⛅</span> 合歡山即時氣象與觀星指數
@@ -134,6 +147,7 @@
             </div>
         </section>
 
+        <!-- 行程深度導覽區 -->
         <section class="glass-panel rounded-3xl p-6 space-y-6">
             <h2 class="text-base font-bold text-white flex items-center gap-2">
                 <span>🏔️</span> 合歡山深度導覽與兩日行程
@@ -175,39 +189,9 @@
                     <p class="text-xs text-gray-300 leading-relaxed">坡度平緩好走，來回約2小時。沿途展望極佳，山頂更有無敵360度環景視野。</p>
                 </div>
             </div>
-
-            <div class="bg-white/5 p-5 rounded-2xl border border-white/10 space-y-3">
-                <h3 class="font-bold text-indigo-300 text-sm flex items-center gap-2">
-                    <span>💡</span> AI摘要 合歡山生態與高山小知識
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-300 leading-relaxed">
-                    <div class="space-y-1">
-                        <p class="font-semibold text-white">🌲 珍貴高山植物</p>
-                        <p>合歡山區擁有豐富的高山寒帶植物，如每年春末夏初盛開的森氏杜鵑，以及生長姿態奇特、蒼勁優美的千年「玉山圓柏」。</p>
-                    </div>
-                    <div class="space-y-1">
-                        <p class="font-semibold text-white">✨ 為什麼適合觀星？</p>
-                        <p>因為海拔高、空氣稀薄且水氣少，大氣透明度極高。合歡山暗空公園在國際暗天協會（IDA）認證下，嚴格管制燈光，讓銀河清晰可見。</p>
-                    </div>
-                </div>
-            </div>
         </section>
 
-        <section class="glass-panel rounded-3xl p-6 space-y-3">
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
-                <span>🗺️</span> 交通路線與地圖導航
-            </h2>
-            <p class="text-xs text-gray-300">沿著國道六號到底，經霧社與清境農場，接台14甲線即可抵達合歡山區。</p>
-            <div class="flex gap-3 pt-2">
-                <a href="https://maps.google.com/?q=武嶺" target="_blank" class="flex-1 text-center bg-indigo-600/60 hover:bg-indigo-600 text-white text-xs font-semibold py-2.5 rounded-xl border border-indigo-400/30 transition">
-                    📍 武嶺 Google 導航
-                </a>
-                <a href="https://maps.google.com/?q=清境農場" target="_blank" class="flex-1 text-center bg-purple-600/60 hover:bg-purple-600 text-white text-xs font-semibold py-2.5 rounded-xl border border-purple-400/30 transition">
-                    🐑 清境農場導航
-                </a>
-            </div>
-        </section>
-
+        <!-- 相簿牆 -->
         <section class="glass-panel rounded-3xl p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-base font-bold text-white flex items-center gap-2">
@@ -219,6 +203,7 @@
             </div>
         </section>
 
+        <!-- 聊天室 -->
         <section class="glass-panel rounded-3xl p-6 flex flex-col h-[500px]">
             <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
                 <div class="flex items-center space-x-2">
@@ -230,8 +215,7 @@
                 <button onclick="changeName()" class="text-xs text-indigo-300 hover:text-white underline transition">修改名字</button>
             </div>
 
-            <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pr-2 mb-4">
-                </div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pr-2 mb-4"></div>
 
             <div class="flex items-center gap-2 pt-2 border-t border-white/10">
                 <label class="p-2.5 rounded-xl glass-input hover:bg-white/10 cursor-pointer transition text-gray-300 hover:text-white flex items-center justify-center shrink-0" title="上傳圖片">
@@ -269,7 +253,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // 輔助函式：將檔案轉成 Base64
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -279,13 +262,24 @@
             });
         }
 
-        // 1. 即時監聽後台設定 (RTDB config)
+        let lastNoticeContent = "";
+
+        // 1. 即時監聽後台設定 (RTDB config) 並偵測推播公告
         onValue(ref(db, "config"), (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 document.getElementById('ui-activity').innerText = data.current_activity || "尚無行程";
                 document.getElementById('ui-desc').innerText = data.current_desc || "";
-                document.getElementById('ui-notice').innerText = data.latest_notice || "目前沒有新公告";
+                
+                const newNotice = data.latest_notice || "目前沒有新公告";
+                document.getElementById('ui-notice').innerText = newNotice;
+
+                // 偵測是否為新的公告推播
+                if (lastNoticeContent !== "" && lastNoticeContent !== newNotice) {
+                    document.getElementById('push-toast-text').innerText = newNotice;
+                    document.getElementById('push-toast').classList.remove('hidden');
+                }
+                lastNoticeContent = newNotice;
                 
                 if (data.weather_temp) document.getElementById('ui-weather-temp').innerText = data.weather_temp;
                 if (data.weather_temp_desc) document.getElementById('ui-weather-temp-desc').innerText = data.weather_temp_desc;
@@ -307,7 +301,7 @@
             }
         });
 
-        // 2. 即時監聽精選照片牆 (RTDB gallery)
+        // 2. 即時監聽精選照片牆
         onValue(ref(db, "gallery"), (snapshot) => {
             const galleryDiv = document.getElementById('ui-gallery');
             galleryDiv.innerHTML = "";
@@ -328,7 +322,7 @@
             });
         });
 
-        // 3. 聊天室名字記憶與即時訊息 (RTDB messages)
+        // 3. 聊天室名字與發送訊息
         let username = localStorage.getItem('hehuanshan_username');
         if (!username) {
             username = prompt("請輸入你的稱呼：") || ("名稱" + Math.floor(Math.random()*1000));
@@ -372,7 +366,7 @@
 
                 await push(ref(db, "messages"), {
                     name: username,
-                    text: "傳送了一張照片 📷",
+                    text: `${username} 發送了一張圖片 📷`,
                     image_url: base64String,
                     timestamp: Date.now()
                 });
@@ -404,7 +398,7 @@
                             <span class="text-xs font-semibold ${isMe ? 'text-purple-300' : 'text-indigo-300'}">${msg.name}</span>
                         </div>
                         <div class="${isMe ? 'bg-indigo-600/60 border-indigo-400/30' : 'bg-white/10 border-white/10'} border text-gray-100 rounded-2xl ${isMe ? 'rounded-tr-sm' : 'rounded-tl-sm'} px-4 py-2.5 text-sm max-w-[80%]">
-                            <p>${escapeHtml(msg.text)}</p>
+                            <p><strong>${msg.name}</strong>：${escapeHtml(msg.text)}</p>
                             ${imageHtml}
                         </div>
                     </div>
