@@ -178,7 +178,7 @@
 
             <div class="bg-white/5 p-5 rounded-2xl border border-white/10 space-y-3">
                 <h3 class="font-bold text-indigo-300 text-sm flex items-center gap-2">
-                    <span>💡</span> 合歡山生態與高山小知識
+                    <span>💡</span> AI摘要 合歡山生態與高山小知識
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-300 leading-relaxed">
                     <div class="space-y-1">
@@ -211,7 +211,7 @@
         <section class="glass-panel rounded-3xl p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-base font-bold text-white flex items-center gap-2">
-                    <span>✨</span> 活動精選相簿牆
+                    <span>✨</span> 活動精選相簿
                 </h2>
             </div>
             <div id="ui-gallery" class="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -223,7 +223,7 @@
             <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
                 <div class="flex items-center space-x-2">
                     <h2 class="text-base font-bold text-white flex items-center gap-2">
-                        <span>💬</span> 夥伴即時聊天室
+                        <span>💬</span> 即時聊天室
                     </h2>
                     <span id="user-badge" class="text-xs bg-white/10 px-2.5 py-0.5 rounded-full text-indigo-200">身分載入中...</span>
                 </div>
@@ -241,7 +241,7 @@
                     <input type="file" id="chat-file-input" accept="image/*" class="hidden" onchange="sendImageMessage(this)">
                 </label>
 
-                <input type="text" id="chat-input" placeholder="輸入訊息跟大家說..." class="flex-1 glass-input rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-400 transition" onkeypress="if(event.key === 'Enter') sendMessage()">
+                <input type="text" id="chat-input" placeholder="輸入訊息..." class="flex-1 glass-input rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-400 transition" onkeypress="if(event.key === 'Enter') sendMessage()">
                 
                 <button onclick="sendMessage()" id="btn-send-msg" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-lg shadow-indigo-600/30 shrink-0">
                     發送
@@ -334,14 +334,14 @@
             username = prompt("請輸入你的稱呼：") || ("名稱" + Math.floor(Math.random()*1000));
             localStorage.setItem('hehuanshan_username', username);
         }
-        document.getElementById('user-badge').innerText = `身分：${username}`;
+        document.getElementById('user-badge').innerText = `名稱：${username}`;
 
         window.changeName = function() {
             let newName = prompt("請輸入新的名字：", username);
             if (newName && newName.trim() !== "") {
                 username = newName.trim();
                 localStorage.setItem('hehuanshan_username', username);
-                document.getElementById('user-badge').innerText = `身分：${username}`;
+                document.getElementById('user-badge').innerText = `名稱：${username}`;
             }
         }
 
